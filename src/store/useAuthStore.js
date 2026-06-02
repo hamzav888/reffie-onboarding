@@ -5,8 +5,9 @@ const useAuthStore = create(
   persist(
     (set) => ({
       user: null,
-      setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
+      token: null,
+      setUser: (user, token) => set({ user, token }),
+      clearUser: () => set({ user: null, token: null }),
     }),
     {
       name: 'reffie-auth-v1',

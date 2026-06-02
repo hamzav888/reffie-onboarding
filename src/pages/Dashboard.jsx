@@ -5,17 +5,9 @@ import FilterRow from '@/components/dashboard/FilterRow';
 import AccountsTable from '@/components/dashboard/AccountsTable';
 import AddAccountModal from '@/modals/AddAccountModal';
 
-/**
- * Dashboard — route: /dashboard
- *
- * Mirrors the prototype's dashboard page exactly:
- *  - Stats grid
- *  - Filter row (search, stage, type, rep)
- *  - Sortable accounts table
- *  - "+ Add account" → AddAccountModal
- */
 export default function Dashboard() {
   const accounts  = useAccountStore((s) => s.accounts);
+  const loading   = useAccountStore((s) => s.loading);
   const sortKey   = useAccountStore((s) => s.sortKey);
   const sortDir   = useAccountStore((s) => s.sortDir);
   const filters   = useAccountStore((s) => s.filters);
@@ -24,7 +16,6 @@ export default function Dashboard() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Apply filters (search + dropdowns)
   const filtered = useMemo(() => {
     const q = filters.query.toLowerCase();
     return accounts.filter((a) => {
@@ -57,26 +48,28 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Stat tiles */}
-      <StatCards accounts={accounts} />
+      {loading && accounts.length === 0 ? (
+        <div className="flex items-center justify-center py-24">
+          <div className="w-8 h-8 border-[3px] border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
+          <StatCards accounts={accounts} />
+          <FilterRow
+            accounts={accounts}
+            filters={filters}
+            onFilter={setFilter}
+            filteredCount={filtered.length}
+          />
+          <AccountsTable
+            accounts={filtered}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={setSort}
+          />
+        </>
+      )}
 
-      {/* Filter row */}
-      <FilterRow
-        accounts={accounts}
-        filters={filters}
-        onFilter={setFilter}
-        filteredCount={filtered.length}
-      />
-
-      {/* Accounts table */}
-      <AccountsTable
-        accounts={filtered}
-        sortKey={sortKey}
-        sortDir={sortDir}
-        onSort={setSort}
-      />
-
-      {/* Add account modal */}
       <AddAccountModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </main>
   );

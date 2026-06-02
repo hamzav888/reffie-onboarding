@@ -23,7 +23,7 @@ A bespoke project management tool for Reffie's customer success team. Track ever
 | UI framework | [React 18](https://react.dev) |
 | Build tool | [Vite 8](https://vitejs.dev) |
 | Styling | [Tailwind CSS 3](https://tailwindcss.com) |
-| State management | [Zustand 5](https://zustand-demo.pmnd.rs) + `persist` middleware |
+| State management | [Zustand 5](https://zustand-demo.pmnd.rs) — in-memory, API-backed |
 | Routing | [React Router 7](https://reactrouter.com) |
 | Font | Inter (Google Fonts) |
 
@@ -33,6 +33,22 @@ A bespoke project management tool for Reffie's customer success team. Track ever
 
 ```bash
 npm install
+```
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable | Description |
+|---|---|
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID (Google Cloud Console → APIs & Services → Credentials) |
+| `VITE_API_BASE_URL` | FastAPI backend URL. Use `http://localhost:8000` in development, your Railway URL in production. |
+
+Start the FastAPI backend first (see backend repo), then:
+
+```bash
 npm run dev
 ```
 
@@ -98,7 +114,7 @@ src/
   lib/
     constants.js   # STAGES, option lists, table columns
     stepsEngine.js # generateSteps(), syncChecklist(), auto-advance logic
-    seedData.js    # 4 demo accounts with seeded checklist state
+    api.js         # HTTP client, snake_case↔camelCase mapping, typed helpers
     utils.js       # fmtArr, stageBadgeVariant, generateId, comparators
   modals/
     AddAccountModal.jsx

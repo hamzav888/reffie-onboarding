@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import useAccountStore from '@/store/useAccountStore';
@@ -12,29 +12,28 @@ import MainPocsCard from '@/components/account/MainPocsCard';
 import TechStackForm from '@/components/account/TechStackForm';
 import Checklist from '@/components/account/Checklist';
 
-/**
- * AccountDetail — route: /accounts/:id
- *
- * Mirrors the prototype's detail page exactly:
- *  - Back button → /dashboard
- *  - Account name + meta (location, rep, type, step count)
- *  - StageStepper
- *  - 2-column grid: left (InfoCard + TechStackForm) | right (Checklist)
- *  - Stage auto-advance with toast
- *  - Onboarding complete toast on 60-day finish
- */
 export default function AccountDetail() {
   const { id } = useParams();
   const { showToast } = useToast();
 
-  // Subscribe to the specific account (re-renders on any account mutation)
-  const account = useAccountStore((s) => s.accounts.find((a) => a.id === id) ?? null);
-  const toggleStep      = useAccountStore((s) => s.toggleStep);
-  const saveNote        = useAccountStore((s) => s.saveNote);
+  const account        = useAccountStore((s) => s.accounts.find((a) => a.id === id) ?? null);
+  const fetchAccount   = useAccountStore((s) => s.fetchAccount);
+  const toggleStep     = useAccountStore((s) => s.toggleStep);
+  const saveNote       = useAccountStore((s) => s.saveNote);
   const toggleSkipStage = useAccountStore((s) => s.toggleSkipStage);
 
-  // Track the most-recently unlocked stage so Checklist can force it open
   const [newlyUnlocked, setNewlyUnlocked] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(true);
+
+  // Fetch full account detail (includes checklist_items + pocs) on mount.
+  useEffect(() => {
+    let cancelled = false;
+    setDetailLoading(true);
+    fetchAccount(id).finally(() => {
+      if (!cancelled) setDetailLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [id]);
 
   const handleToggleStep = useCallback(
     (stepId) => {
@@ -42,7 +41,6 @@ export default function AccountDetail() {
       if (result?.advanced) {
         setNewlyUnlocked(result.newStage);
         showToast(`Stage advanced → ${result.newStage}`);
-        // Clear after Checklist has consumed it
         setTimeout(() => setNewlyUnlocked(null), 100);
       } else if (result?.completed) {
         showToast('Onboarding complete! 🎉');
@@ -60,6 +58,22 @@ export default function AccountDetail() {
     (stageName) => toggleSkipStage(id, stageName),
     [id, toggleSkipStage]
   );
+
+  if (detailLoading && !account) {
+    return (
+      <main className="max-w-[1240px] mx-auto px-7 py-8">
+        <Link to="/dashboard" className="btn-secondary inline-flex mb-5">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Back to dashboard
+        </Link>
+        <div className="flex items-center justify-center py-24">
+          <div className="w-8 h-8 border-[3px] border-brand border-t-transparent rounded-full animate-spin" />
+        </div>
+      </main>
+    );
+  }
 
   if (!account) {
     return (

@@ -48,26 +48,22 @@ export function generateSteps(ts, skippedStages = []) {
   if (ts.pms) {
     const pmsText = ts.pms === 'Resman'
       ? 'Resman Ingestion Setup:\n1. Go to the section labeled Reporting\n2. Select Custom Report\n3. In the section, start typing "New prospect" and select this as the report type\n4. In the report builder, set multiple send times for this report\n5. Use the Reffie ingestion email as the recipient for each send\n6. Add a report to send every 30 minutes from 12:00am to 11:30pm'
-      : `[${ts.pms} integration step — instructions TBD]`;
+      : `Connect to ${ts.pms} (PMS System) for lead ingestion`;
     add('Kick-off call', 'pms', pmsText);
   }
 
   if (ts.tour && ts.tour !== 'None') {
     const tourText = ts.tour === 'Showmojo'
       ? 'Showmojo webhook setup — follow the instructions here: https://reffie.tawk.help/article/webhook-setup'
-      : `[${ts.tour} setup step — instructions TBD]`;
+      : `Connect to ${ts.tour} to pull in tours`;
     add('Kick-off call', 'tour', tourText);
     if (ts.lockboxes) {
-      add('Kick-off call', 'lockbox', `[Lockbox configuration for ${ts.tour} — instructions TBD]`, true);
+      add('Kick-off call', 'lockbox', 'Any special setup around lockboxes?', true);
     }
   }
 
   if (ts.applications && ts.applications !== 'None') {
-    const lbl =
-      ts.applications === 'PMS system'
-        ? `${ts.pms || 'PMS'} applications`
-        : ts.applications;
-    add('Kick-off call', 'apps', `[${lbl} connection step — instructions TBD]`);
+    add('Kick-off call', 'apps', `Connect to ${ts.applications} to pull in application data`);
   }
 
   if (ts.zillow === 'Paid') {

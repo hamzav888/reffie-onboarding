@@ -245,6 +245,29 @@ export default function TechStackForm({ account }) {
                 </div>
               )}
             </div>
+
+            {/* Email provider */}
+            <div className="mt-3">
+              <FieldLabel>Email provider</FieldLabel>
+              <select
+                className={selectCls}
+                value={ts.sharedEmailProvider || ''}
+                onChange={(e) => handleChange('sharedEmailProvider', e.target.value)}
+              >
+                <option value="">Select provider…</option>
+                <option>Outlook</option>
+                <option>Gmail</option>
+              </select>
+            </div>
+
+            {/* IT approval */}
+            <div className="mt-3">
+              <Toggle
+                checked={!!ts.sharedEmailITApproval}
+                onChange={(v) => handleChange('sharedEmailITApproval', v)}
+                label="Contact IT for approval?"
+              />
+            </div>
           </div>
         )}
       </FormGroup>

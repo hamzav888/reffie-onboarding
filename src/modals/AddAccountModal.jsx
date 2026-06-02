@@ -13,6 +13,8 @@ const DEFAULT_TS = {
   sharedEmail: false,
   sharedEmailAddr: '',
   sharedEmailAddrs: [],
+  sharedEmailProvider: '',
+  sharedEmailITApproval: false,
   other: '',
 };
 
@@ -78,6 +80,7 @@ export default function AddAccountModal({ open, onClose }) {
     rep: '',
   });
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const firstInputRef = useRef(null);
 
@@ -105,7 +108,7 @@ export default function AddAccountModal({ open, onClose }) {
   // Derive existing rep names for quick-fill datalist
   const existingReps = [...new Set(accounts.map((a) => a.rep))].sort();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -115,21 +118,27 @@ export default function AddAccountModal({ open, onClose }) {
       return setError('ARR must be a positive number.');
     if (!form.rep.trim()) return setError('CS rep is required.');
 
-    const id = addAccount({
-      name:     form.name.trim(),
-      location: form.location.trim(),
-      type:     form.type,
-      arr:      Number(form.arr),
-      months:   Number(form.months),
-      metrics:  form.metrics.trim(),
-      rep:      form.rep.trim(),
-      stage:    STAGES[0],   // Pre-kick off
-      ts:       DEFAULT_TS,
-      pocs:     [],
-    });
-
-    onClose();
-    navigate(`/accounts/${id}`);
+    setSubmitting(true);
+    try {
+      const id = await addAccount({
+        name:     form.name.trim(),
+        location: form.location.trim(),
+        type:     form.type,
+        arr:      Number(form.arr),
+        months:   Number(form.months),
+        metrics:  form.metrics.trim(),
+        rep:      form.rep.trim(),
+        stage:    STAGES[0],
+        ts:       DEFAULT_TS,
+        pocs:     [],
+      });
+      onClose();
+      navigate(`/accounts/${id}`);
+    } catch (err) {
+      setError(err.message ?? 'Failed to create account. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -283,8 +292,9 @@ export default function AddAccountModal({ open, onClose }) {
               type="submit"
               form="add-account-form"
               className="btn-primary"
+              disabled={submitting}
             >
-              Create account
+              {submitting ? 'Creating…' : 'Create account'}
             </button>
           </div>
         </div>

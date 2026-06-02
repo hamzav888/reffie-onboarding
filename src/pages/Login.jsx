@@ -18,7 +18,10 @@ export default function Login() {
       setError('Access restricted to Reffie team members only.');
       return;
     }
-    setUser({ name: decoded.name, email: decoded.email, picture: decoded.picture });
+    setUser(
+      { name: decoded.name, email: decoded.email, picture: decoded.picture },
+      response.credential
+    );
     navigate('/dashboard');
   };
 
