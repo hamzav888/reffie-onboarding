@@ -117,7 +117,7 @@ export function mapAccountFromApi(data) {
     name: data.company_name ?? '',
     location: data.location ?? '',
     type: data.property_type ?? 'SFR',
-    arr: data.arr ?? 0,
+    arr: Number(data.arr ?? 0),
     months: data.contract_length ?? 12,        // backend: contract_length
     metrics: data.success_metrics ?? '',
     rep: data.cs_rep ?? '',                    // backend: cs_rep
