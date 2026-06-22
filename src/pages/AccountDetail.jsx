@@ -63,6 +63,8 @@ export default function AccountDetail() {
     [id, toggleSkipStage]
   );
 
+  const fetchAccountCalls = useCallback(() => api.dayAiCalls.list(id), [id]);
+
   const handleHubSpotSync = async () => {
     if (syncing) return;
     setSyncing(true);
@@ -196,7 +198,7 @@ export default function AccountDetail() {
         </div>
       </div>
 
-      <DayAiCallsCard accountId={id} />
+      <DayAiCallsCard fetchCalls={fetchAccountCalls} />
     </main>
   );
 }

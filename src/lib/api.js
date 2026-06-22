@@ -286,6 +286,16 @@ export const api = {
     refresh: () => {
       apiFetch('/upcoming-deals/refresh', { method: 'POST' }).catch(() => {});
     },
+    dayAiCalls: async (dealId) => {
+      const data = await apiFetch(`/upcoming-deals/${dealId}/day-ai-calls`);
+      return (data ?? []).map((c) => ({
+        objectId:  c.object_id,
+        title:     c.title      ?? null,
+        startedAt: c.started_at ?? null,
+        summary:   c.summary    ?? null,
+        callUrl:   c.call_url   ?? null,
+      }));
+    },
   },
 
   dayAiCalls: {
@@ -298,6 +308,10 @@ export const api = {
         summary:   c.summary    ?? null,
         callUrl:   c.call_url   ?? null,
       }));
+    },
+    getTranscript: async (callId) => {
+      const data = await apiFetch(`/day-ai-calls/${callId}/transcript`);
+      return data?.transcript ?? null;
     },
   },
 };

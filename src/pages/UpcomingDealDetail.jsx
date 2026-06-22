@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useUpcomingDealsStore from '@/store/useUpcomingDealsStore';
 import { DEAL_STAGE_LABELS } from '@/lib/constants';
 import { UNSUPPORTED_TS } from '@/lib/stepsEngine';
 import { fmtArr } from '@/lib/utils';
+import { api } from '@/lib/api';
+import DayAiCallsCard from '@/components/account/DayAiCallsCard';
 
 function InfoRow({ label, children }) {
   return (
@@ -52,6 +54,7 @@ export default function UpcomingDealDetail() {
 
   const deal      = useUpcomingDealsStore((s) => s.deals.find((d) => d.id === id) ?? null);
   const fetchDeal = useUpcomingDealsStore((s) => s.fetchDeal);
+  const fetchDealCalls = useCallback(() => api.upcomingDeals.dayAiCalls(id), [id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -161,6 +164,8 @@ export default function UpcomingDealDetail() {
           </div>
         </div>
       </div>
+
+      <DayAiCallsCard fetchCalls={fetchDealCalls} />
     </main>
   );
 }
