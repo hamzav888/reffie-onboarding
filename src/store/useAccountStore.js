@@ -289,7 +289,7 @@ const useAccountStore = create((set, get) => ({
   addPoc: (accountId) => {
     const account = get().accounts.find((a) => a.id === accountId);
     if (!account) return;
-    const newPoc = { id: generateId(), name: '', role: '', inviteSent: false };
+    const newPoc = { id: generateId(), name: '', email: '', role: '', inviteSent: false };
     const newPocs = [...(account.pocs ?? []), newPoc];
 
     set((s) => ({

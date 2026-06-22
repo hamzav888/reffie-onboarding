@@ -121,6 +121,7 @@ export function mapAccountFromApi(data) {
     months: data.contract_length ?? 12,        // backend: contract_length
     metrics: data.success_metrics ?? '',
     rep: data.cs_rep ?? '',                    // backend: cs_rep
+    aeName: data.ae_name ?? null,
     stage: data.onboarding_stage ?? 'Pre-kick off',
     kickoffCallDate: data.kickoff_call_date ?? null,
     skippedStages: data.skipped_stages ?? [],

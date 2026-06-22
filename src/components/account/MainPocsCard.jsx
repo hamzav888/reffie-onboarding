@@ -1,5 +1,6 @@
 import React from 'react';
 import useAccountStore from '@/store/useAccountStore';
+import { useToast } from '@/components/layout/Toast';
 
 const inputCls = `w-full h-9 px-[10px] border border-[rgba(0,0,0,0.14)] rounded-sm
   bg-page font-[family:inherit] text-sm text-ink outline-none block
@@ -10,6 +11,7 @@ export default function MainPocsCard({ account }) {
   const addPoc    = useAccountStore((s) => s.addPoc);
   const updatePoc = useAccountStore((s) => s.updatePoc);
   const removePoc = useAccountStore((s) => s.removePoc);
+  const { showToast } = useToast();
 
   const pocs = account.pocs ?? [];
 
@@ -63,6 +65,27 @@ export default function MainPocsCard({ account }) {
               onBlur={(e) => updatePoc(account.id, poc.id, 'role', e.target.value)}
             />
           </div>
+
+          {/* Email with copy button */}
+          {poc.email && (
+            <div className="flex items-center gap-1.5 mt-2 mb-2">
+              <span className="text-xs text-muted truncate flex-1">{poc.email}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(poc.email);
+                  showToast('Email copied!');
+                }}
+                className="w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-sm text-hint hover:text-ink hover:bg-[#F0EDE8] transition-all"
+                aria-label="Copy email"
+              >
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="5.5" y="2.5" width="9" height="12" rx="1.5" />
+                  <path d="M5.5 5.5H2a1 1 0 00-1 1v8a1 1 0 001 1h7a1 1 0 001-1v-3" />
+                </svg>
+              </button>
+            </div>
+          )}
 
           {/* Account invite sent */}
           <div className="flex items-center gap-2 pt-[3px]">

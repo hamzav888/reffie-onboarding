@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import useAccountStore from '@/store/useAccountStore';
 import { generateSteps } from '@/lib/stepsEngine';
 import { fmtArr } from '@/lib/utils';
+import { api } from '@/lib/api';
 import { useToast } from '@/components/layout/Toast';
 
 import StageStepper from '@/components/account/StageStepper';
@@ -26,6 +27,7 @@ export default function AccountDetail() {
 
   const [newlyUnlocked, setNewlyUnlocked] = useState(null);
   const [detailLoading, setDetailLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   // Fetch full account detail (includes checklist_items + pocs) on mount.
   useEffect(() => {
@@ -60,6 +62,21 @@ export default function AccountDetail() {
     (stageName) => toggleSkipStage(id, stageName),
     [id, toggleSkipStage]
   );
+
+  const handleHubSpotSync = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    showToast('Syncing from HubSpot...');
+    try {
+      await api.hubspot.sync(account.hubspotDealId);
+      await fetchAccount(id);
+      showToast('Synced!');
+    } catch (err) {
+      showToast(err?.message || 'Sync failed');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   if (detailLoading && !account) {
     return (
@@ -104,15 +121,26 @@ export default function AccountDetail() {
           </svg>
           Back to dashboard
         </Link>
-        <button
-          className="btn-secondary"
-          onClick={() => {
-            archiveAccount(id, !account.archived);
-            showToast(account.archived ? 'Account unarchived' : 'Account archived');
-          }}
-        >
-          {account.archived ? 'Unarchive' : 'Archive'}
-        </button>
+        <div className="flex items-center gap-2">
+          {account.hubspotDealId && (
+            <button
+              className="btn-secondary"
+              disabled={syncing}
+              onClick={handleHubSpotSync}
+            >
+              {syncing ? 'Syncing...' : 'Re-sync HubSpot'}
+            </button>
+          )}
+          <button
+            className="btn-secondary"
+            onClick={() => {
+              archiveAccount(id, !account.archived);
+              showToast(account.archived ? 'Account unarchived' : 'Account archived');
+            }}
+          >
+            {account.archived ? 'Unarchive' : 'Archive'}
+          </button>
+        </div>
       </div>
 
       {/* Account header */}
@@ -126,9 +154,17 @@ export default function AccountDetail() {
           )}
         </h1>
         <div className="flex items-center gap-2 flex-wrap mt-[5px] text-sm text-muted">
+          {account.hubspotDealId && (
+            <>
+              <span>Deal #{account.hubspotDealId}</span>
+              <span className="w-[3px] h-[3px] rounded-full bg-hint flex-shrink-0" />
+            </>
+          )}
           <span>{account.location}</span>
           <span className="w-[3px] h-[3px] rounded-full bg-hint flex-shrink-0" />
           <span>{account.rep}</span>
+          <span className="w-[3px] h-[3px] rounded-full bg-hint flex-shrink-0" />
+          <span>AE: {account.aeName ?? 'Unassigned'}</span>
           <span className="w-[3px] h-[3px] rounded-full bg-hint flex-shrink-0" />
           <span>{account.type}</span>
           <span className="w-[3px] h-[3px] rounded-full bg-hint flex-shrink-0" />
