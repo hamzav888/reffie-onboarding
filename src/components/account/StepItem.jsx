@@ -28,7 +28,7 @@ function renderTextWithLinks(text) {
   );
 }
 
-export default function StepItem({ step, state, onToggle, onSaveNote }) {
+export default function StepItem({ step, state, onToggle, onSaveNote, disabled = false }) {
   const [noteOpen, setNoteOpen] = useState(!!state.note);
   const textareaRef = useRef(null);
 
@@ -60,7 +60,7 @@ export default function StepItem({ step, state, onToggle, onSaveNote }) {
         />
       )}
 
-      <StepCheckbox checked={state.done} onChange={onToggle} />
+      <StepCheckbox checked={state.done} onChange={onToggle} disabled={disabled} />
 
       <div className="flex-1 min-w-0">
         {/* Step text + note chip */}
@@ -80,16 +80,18 @@ export default function StepItem({ step, state, onToggle, onSaveNote }) {
         </div>
 
         {/* Note toggle button */}
-        <button
-          type="button"
-          onClick={toggleNote}
-          className="mt-1 text-[11px] font-semibold text-brand cursor-pointer hover:text-brand-dark transition-colors bg-transparent border-none p-0"
-        >
-          {hasNote ? 'Edit note' : '+ Add note'}
-        </button>
+        {!disabled && (
+          <button
+            type="button"
+            onClick={toggleNote}
+            className="mt-1 text-[11px] font-semibold text-brand cursor-pointer hover:text-brand-dark transition-colors bg-transparent border-none p-0"
+          >
+            {hasNote ? 'Edit note' : '+ Add note'}
+          </button>
+        )}
 
         {/* Note textarea */}
-        {noteOpen && (
+        {noteOpen && !disabled && (
           <textarea
             ref={textareaRef}
             className="w-full mt-[6px] bg-page border border-[rgba(0,0,0,0.14)] rounded-sm

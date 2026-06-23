@@ -71,6 +71,18 @@ export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlo
       <div className="flex flex-col gap-[5px]">
         {STAGES.map((stage, stageIndex) => {
           const stageSteps = steps.filter((s) => s.stage === stage);
+          // Stage right after current is always locked (preview).
+          // Stages further ahead unlock when every stage between current and them is skipped.
+          let isLocked = false;
+          if (stageIndex > si) {
+            isLocked = true;
+            if (stageIndex > si + 1) {
+              isLocked = false;
+              for (let j = si + 1; j < stageIndex; j++) {
+                if (!skippedStages.includes(STAGES[j])) { isLocked = true; break; }
+              }
+            }
+          }
           return (
             <StageBlock
               key={stage}
@@ -85,6 +97,7 @@ export default function Checklist({ account, onToggleStep, onSaveNote, newlyUnlo
               onSaveNote={onSaveNote}
               isSkipped={skippedStages.includes(stage)}
               onToggleSkip={onToggleSkip ? () => onToggleSkip(stage) : undefined}
+              isLocked={isLocked}
             />
           );
         })}

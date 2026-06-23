@@ -4,20 +4,22 @@ import React from 'react';
  * StepCheckbox — animated square checkbox for checklist items.
  * Matches prototype's .cbtn / .cmark animation exactly.
  */
-export default function StepCheckbox({ checked, onChange }) {
+export default function StepCheckbox({ checked, onChange, disabled = false }) {
   return (
     <button
       type="button"
-      onClick={onChange}
+      onClick={disabled ? undefined : onChange}
       aria-checked={checked}
+      aria-disabled={disabled}
       role="checkbox"
       className={[
         'w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center',
-        'flex-shrink-0 mt-0.5 cursor-pointer',
-        'transition-all duration-150',
-        checked
-          ? 'bg-brand border-brand hover:bg-brand-dark hover:border-brand-dark'
-          : 'bg-white border-[rgba(0,0,0,0.14)] hover:border-brand hover:bg-brand-tint hover:scale-[1.12]',
+        'flex-shrink-0 mt-0.5 transition-all duration-150',
+        disabled
+          ? 'opacity-40 cursor-not-allowed pointer-events-none bg-white border-[rgba(0,0,0,0.14)]'
+          : checked
+            ? 'bg-brand border-brand hover:bg-brand-dark hover:border-brand-dark cursor-pointer'
+            : 'bg-white border-[rgba(0,0,0,0.14)] hover:border-brand hover:bg-brand-tint hover:scale-[1.12] cursor-pointer',
       ].join(' ')}
       style={{ transitionTimingFunction: 'cubic-bezier(0.34,1.4,0.64,1)' }}
     >

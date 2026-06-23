@@ -23,6 +23,7 @@ export default function StageBlock({
   onSaveNote,
   isSkipped,
   onToggleSkip,
+  isLocked = false,
 }) {
   const isPast    = stageIndex < currentStageIndex;
   const isCurrent = stageIndex === currentStageIndex;
@@ -107,16 +108,20 @@ export default function StageBlock({
       {/* Collapsible body */}
       {isOpen && (
         <div className="border-t border-[rgba(0,0,0,0.08)]">
-          {isFuture ? (
-            <div className="px-4 py-3 text-xs text-hint italic bg-page">
-              Complete the current stage to unlock these steps
-            </div>
-          ) : steps.length === 0 ? (
+          {steps.length === 0 ? (
             <div className="px-4 py-3 text-xs text-hint italic bg-page">
               No steps for this stage with the current tech stack.
             </div>
           ) : (
             <div className="flex flex-col">
+              {isLocked && (
+                <div className="px-[14px] py-[7px] flex items-center gap-1.5 text-[11px] text-hint italic border-b border-[rgba(0,0,0,0.08)] bg-page">
+                  <svg width="10" height="11" viewBox="0 0 10 11" fill="currentColor" aria-hidden>
+                    <path d="M8 4.5H7.5V3A2.5 2.5 0 0 0 2.5 3v1.5H2A1 1 0 0 0 1 5.5v4a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1ZM3.5 3a1.5 1.5 0 0 1 3 0v1.5h-3V3Zm2 5H4.5V6.5a.5.5 0 0 1 1 0V8Z" />
+                  </svg>
+                  Preview only — complete earlier stages to unlock
+                </div>
+              )}
               {steps.map((step) => (
                 <StepItem
                   key={step.id}
@@ -124,6 +129,7 @@ export default function StageBlock({
                   state={checklist[step.id] ?? { done: false, note: '' }}
                   onToggle={() => onToggleStep(step.id)}
                   onSaveNote={(note) => onSaveNote(step.id, note)}
+                  disabled={isLocked}
                 />
               ))}
             </div>
